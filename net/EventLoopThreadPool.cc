@@ -29,7 +29,7 @@ void EventLoopThreadPool::start() {
 
     for (int i = 0; i < numThreads_; ++i) {
         EventLoopThread *t = new EventLoopThread;
-        threads_.push_back(static_cast<const std::unique_ptr<EventLoopThread, std::default_delete<EventLoopThread>>>(t));
+        //threads_.push_back(static_cast<const std::unique_ptr<EventLoopThread, std::default_delete<EventLoopThread>>>(t));
         loops_.push_back(t->startLoop());
     }
 }

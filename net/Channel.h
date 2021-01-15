@@ -30,10 +30,10 @@ namespace Kukai{
             /*
              * 设置回调函数，read，write，error Callback函数，在处理event时被调用
              * */
-            void setReadCallback(const ReadEventCallback &cb){ readCallback_ = std::move(cb); }
-            void setWriteCallback(const EventCallback cb){ writeCallback_ = std::move(cb); }
-            void setErrorCallback(const EventCallback cb){ errorCallback_ = std::move(cb); }
-            void setCloseCallback(const EventCallback cb){ closeCallback_ = std::move(cb); }
+            void setReadCallback(const ReadEventCallback &cb){ readCallback_ = cb; }
+            void setWriteCallback(const EventCallback &cb){ writeCallback_ = cb; }
+            void setErrorCallback(const EventCallback &cb){ errorCallback_ = cb; }
+            void setCloseCallback(const EventCallback &cb){ closeCallback_ = cb; }
 
             /*
              * channel所负责IO事件的那个fd

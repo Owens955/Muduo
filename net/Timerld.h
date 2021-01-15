@@ -11,12 +11,12 @@ namespace Kukai{
 
     class Timerld{
     public:
-        explicit Timerld(Timer *timer, int64_t seq = 0)
+        Timerld(Timer *timer = NULL, int64_t seq = 0)
             : timer_(timer),
               sequence_(seq)
             { }
 
-            friend class TimerQueue;
+        friend class TimerQueue;
 
     private:
         Timer *timer_;

@@ -62,7 +62,7 @@ class EventLoop : boost::noncopyable{
     /*
      * 取消定时器timerld
      * */
-    //void cancel(Timerld timerld);
+    void cancel(Timerld timerld);
 
     void wakeup();
 

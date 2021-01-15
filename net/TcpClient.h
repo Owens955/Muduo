@@ -6,22 +6,34 @@
 #define MUDUO_NET_TCPCLIENT_H
 
 #include <cstring>
+#include <memory>
+#include "../base/Mutex.h"
 #include "Callbacks.h"
 #include "TcpConnection.h"
 
 namespace Kukai{
 
     class Connector;
-    class EventLoop;
+    typedef std::shared_ptr<Connector> ConnectorPtr;
 
     class TcpClient : boost::noncopyable{
     public:
-        TcpClient(EventLoop *loop,const InetAddress &connectAddr,const std::string & name);
+        TcpClient(EventLoop *loop,const InetAddress &serverAddr);
         ~TcpClient();
 
-    void Connect();
+    void connect();
+    void disconnect();
+    void stop();
 
-    void setConnectionCallback(const ConnectionCallback& cb)
+    TcpConnectionPtr connection() const{
+        MutexLockGuard lock(mutex_);
+        return connection_;
+    }
+
+    bool retry() const;
+    void enableRetry() { retry_ = true; }
+
+    void setNewConnectionCallback(const ConnectionCallback& cb)
     { connectionCallback_ = cb; }
 
     void setMessageCallback(const MessageCallback& cb)
@@ -32,16 +44,19 @@ namespace Kukai{
 
     private:
 
-        void newConnection(int sockfd, InetAddress &connectAddr);
+        void newConnection(int sockfd);
+        void removeConnection(const TcpConnectionPtr &conn);
 
         EventLoop *loop_;
-        const std::string name_;
-        std::unique_ptr<Connector> connector_;
-        TcpConnectionPtr connection_;
+        ConnectorPtr connector_;
         ConnectionCallback connectionCallback_;
         MessageCallback messageCallback_;
         WriteCompleteCallback writeCompleteCallback_;
-
+        bool retry_;
+        bool connect_;
+        int nextConnld_;
+        mutable MutexLock mutex_;
+        TcpConnectionPtr connection_;
     };
 }
 

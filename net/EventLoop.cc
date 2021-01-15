@@ -133,6 +133,10 @@ Timerld EventLoop::runEvery(double interval, const TimerCallback &cb) {
     return timerQueue_->addTimer(cb, time, interval);
 }
 
+void EventLoop::cancel(Timerld timerld) {
+    return timerQueue_->cancel(timerld);
+}
+
 /*
  * 更新channel，实际上调用了poller::updatechannel，更新poller的pollfds数组
  * */

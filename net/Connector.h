@@ -19,12 +19,12 @@ namespace Kukai{
 
     class Connector : boost::noncopyable {
     public:
-        typedef std::function<void (int sockfd, InetAddress &serverAddr)> NewConnectionCallback;
+        typedef std::function<void (int sockfd)> NewConnectionCallback;
 
         Connector(EventLoop *loop, const InetAddress &serverAddr);
         ~Connector();
 
-        void setConnectionCallback(const NewConnectionCallback &cb)
+        void setNewConnectionCallback(const NewConnectionCallback &cb)
         { newConnectionCallback_ = cb; }
 
         void start();

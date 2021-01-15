@@ -5,7 +5,8 @@
 #include <cstdio>
 #include <iostream>
 #include <vector>
-std::string message;
+
+std::string message = "Hello!";
 
 void onConnection(const Kukai::TcpConnectionPtr& conn)
 {
@@ -14,6 +15,7 @@ void onConnection(const Kukai::TcpConnectionPtr& conn)
         printf("onConnection(): new connection [%s] from %s\n",
                conn->name().c_str(),
                conn->peerAddress().toHostPort().c_str());
+        //conn->send(message);
     }
     else
     {
@@ -42,15 +44,19 @@ void onMessage(const Kukai::TcpConnectionPtr& conn,
 
 void OnConnection(const Kukai::TcpConnectionPtr &conn){
     if (conn->connected()){
-        LOG("connect successs");
+        LOG("new connection [" << conn->name().c_str()
+            << "] from " << conn->peerAddress().toHostPort().c_str());
     } else {
-        printf("connect fail\n");
+        LOG("onConnection() : connection [" << conn->name().c_str()
+            << "] is down");
     }
 }
 
 void OnMassage(const Kukai::TcpConnectionPtr &conn , Kukai::Buffer *buf, Kukai::Timestamp time){
     std::string msg(buf->retrieveAsString());
-    printf("onMassage() : recv a message : %s\n", msg.c_str());
+    LOG("OnMessage : received " << buf->readableBytes() <<
+        "d bytes from connection [" << conn->name().c_str() <<
+        "] at " << time.toFormattedString().c_str());
 
 }
 
@@ -89,7 +95,6 @@ int main(int argc, char* argv[])
 {
     printf("main(): pid = %d\n", getpid());
 
-
     if (argc < 2){
     /*服务端*/
     Kukai::InetAddress listenAddr(9981);
@@ -104,15 +109,16 @@ int main(int argc, char* argv[])
     } else {
     /*客户端*/
 
-    Kukai::InetAddress connectAddr("192.168.1.101", 9981);
+    printf("main(): pid = %d\n", getpid());
+
     Kukai::EventLoop loop;
+    Kukai::InetAddress serverAddr("192.168.1.101", 9981);
+    Kukai::TcpClient client(&loop, serverAddr);
 
-    Kukai::TcpClient client(&loop, connectAddr,"client");
-
-    client.setConnectionCallback(OnConnection);
+    client.setNewConnectionCallback(OnConnection);
     client.setMessageCallback(OnMassage);
-    client.setWriteCompleteCallback(handleWrite);
-    client.Connect();
+    client.enableRetry();
+    client.connect();
     loop.loop();
     }
 }
